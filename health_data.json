@@ -1,0 +1,9 @@
+{
+  "headache": {
+    "keywords": ["headache", "head pain", "migraine"],
+    "causes": ["dehydration", "tension", "eyestrain"],
+    "precautions": [ "Regular Sleep","Hydration"],
+    "home_remedies": [ "Relaxation & Massage","Breathing Exercises"],
+    "severity_tips": "see doctor if fever, vomiting, confusion"
+  }
+}
