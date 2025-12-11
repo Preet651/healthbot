@@ -1,1 +1,44 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
+import json, re
 
+app = FastAPI()
+
+with open("data/health_data.json") as f:
+    KB = json.load(f)
+
+class Message(BaseModel):
+    message: str
+
+def find_symptom(text):
+    text = text.lower()
+    for key, v in KB.items():
+        for kw in v.get("keywords", []) + [key]:
+            if re.search(r"\b" + re.escape(kw) + r"\b", text):
+                return key
+    return None
+
+@app.get("/")
+def home():
+    return {"message": "Healthcare chatbot API is running"}
+
+@app.post("/chat")
+async def chat(input: Message):
+    text = input.message.lower()
+
+    if any(e in text for e in ["chest pain", "unconscious", "breathing difficulty", "severe bleeding"]):
+        return {"response": "Emergency detected. Visit hospital immediately."}
+
+    symptom = find_symptom(text)
+    if not symptom:
+        return {"response": "Could not detect symptom. Please describe clearly."}
+
+    entry = KB[symptom]
+    return {
+        "symptom": symptom,
+        "causes": entry["causes"],
+        "precautions": entry["precautions"],
+        "prevention": entry["prevention"],
+        "home_remedies": entry["home_remedies"],
+        "disclaimer": "Not a medical diagnosis."
+    }
